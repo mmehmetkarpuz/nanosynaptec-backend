@@ -9,9 +9,10 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* === TEMEL STİLLER === */
+        /* === TEMEL STİLLER (MEVCUT TASARIM KORUNDU) === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -35,6 +36,7 @@
             font-size: 1.8rem; font-weight: bold;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            cursor: pointer;
         }
         .nav-links { display: flex; list-style: none; gap: 2rem; }
         .nav-links a { color: white; text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
@@ -65,7 +67,7 @@
         }
         .research-card:hover { transform: translateY(-10px); }
         
-        /* === CHATBOT STİLLERİ === */
+        /* === CHATBOT STİLLERİ (GELİŞTİRİLMİŞ) === */
         .chat-toggle-btn {
             position: fixed; bottom: 20px; right: 20px; width: 65px; height: 65px;
             background: linear-gradient(135deg, #00c6ff, #0072ff);
@@ -96,36 +98,56 @@
             flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9;
             display: flex; flex-direction: column; gap: 10px;
         }
-        .message { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-        .bot-message { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .message { max-width: 85%; padding: 10px 15px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .bot-message { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #ddd; }
         .user-message { background: #0072ff; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
         
         .chat-input-area { padding: 15px; border-top: 1px solid #eee; display: flex; background: white; }
         #chat-user-input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
         #chat-send-btn {
             background: #0072ff; color: white; border: none; width: 40px; height: 40px;
-            border-radius: 50%; margin-left: 10px; cursor: pointer;
+            border-radius: 50%; margin-left: 10px; cursor: pointer; transition: background 0.3s;
         }
+        #chat-send-btn:hover { background: #0056b3; }
 
-        .typing-indicator { display: none; padding: 10px; font-size: 12px; color: #888; font-style: italic; margin-left: 10px; }
+        .typing-indicator { display: none; padding: 5px 15px; font-size: 12px; color: #888; font-style: italic; }
 
-        /* MODALS */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 10% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 20px; position: relative; }
-        .close { float: right; font-size: 28px; cursor: pointer; }
+        /* MODALS & FORMS */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .modal-content { 
+            background: white; margin: 10% auto; padding: 2.5rem; width: 90%; max-width: 450px; 
+            border-radius: 20px; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: #aaa; }
+        .close:hover { color: #333; }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .auth-switch { text-align: center; margin-top: 15px; font-size: 0.9rem; }
+        .auth-switch a { color: #667eea; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
     <header>
         <nav class="container">
-            <div class="logo">NanoSynapseTech</div>
+            <div class="logo" onclick="location.reload()">NanoSynapseTech</div>
             <div class="right-section">
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#research">Research</a></li>
                     <li><a href="#about">About</a></li>
                 </ul>
-                <button class="btn btn-secondary" onclick="openModal('loginModal')">Login</button>
+                <div id="auth-buttons">
+                    <button class="btn btn-secondary" onclick="openModal('loginModal')">Login</button>
+                </div>
+                <div id="user-profile" style="display:none; align-items:center; gap:10px;">
+                    <span style="color:white; font-weight:bold;" id="nav-username">User</span>
+                    <button class="btn btn-secondary" style="padding: 0.4rem 1rem; font-size:0.8rem;" onclick="logout()">Çıkış</button>
+                </div>
             </div>
         </nav>
     </header>
@@ -140,10 +162,18 @@
         <section id="research" class="section">
             <h2>Research Areas</h2>
             <div class="research-grid">
-                <div class="research-card"><h3>🔬 Nanoparticles</h3><p>Targeted drug delivery systems</p></div>
-                <div class="research-card"><h3>🧬 Bioinformatics</h3><p>Genomic data analysis</p></div>
-                <div class="research-card"><h3>🌱 Plant Pathology</h3><p>Disease resistance study</p></div>
-                <div class="research-card"><h3>🎗️ Cancer Research</h3><p>Micro-robotics in oncology</p></div>
+                <div class="research-card" onclick="alert('Nanopartikül detayları yakında...')">
+                    <h3>🔬 Nanoparticles</h3><p>Targeted drug delivery systems</p>
+                </div>
+                <div class="research-card">
+                    <h3>🧬 Bioinformatics</h3><p>Genomic data analysis</p>
+                </div>
+                <div class="research-card">
+                    <h3>🌱 Plant Pathology</h3><p>Disease resistance study</p>
+                </div>
+                <div class="research-card">
+                    <h3>🎗️ Cancer Research</h3><p>Micro-robotics in oncology</p>
+                </div>
             </div>
         </section>
     </main>
@@ -156,18 +186,20 @@
         <div class="chat-header">
             <div>
                 <h3 style="margin:0; font-size:16px;">NanoSynapse Asistan</h3>
-                <p style="margin:0; font-size:11px; opacity:0.9;">🟢 AI Online</p>
+                <p style="margin:0; font-size:11px; opacity:0.9;">🟢 AI Online | Hybrid Mode</p>
             </div>
             <button class="chat-close-btn" onclick="toggleChat()"><i class="fas fa-times"></i></button>
         </div>
         
         <div id="chat-box">
             <div class="message bot-message">
-                Merhaba! 👋 Ben NanoSynapseTech asistanıyım. Araştırmalarımız (Nano, Kanser, Biyo) hakkında ne öğrenmek istersin?
+                Merhaba! 👋 Ben NanoSynapseTech asistanıyım. 
+                <br><br>
+                Size <b>Nanopartiküller</b>, <b>Kanser Araştırmaları</b> veya <b>Üyelik işlemleri</b> hakkında bilgi verebilirim. Ne sormak istersiniz?
             </div>
         </div>
         
-        <div class="typing-indicator" id="typing-indicator">Asistan yazıyor...</div>
+        <div class="typing-indicator" id="typing-indicator">Asistan düşünüyor...</div>
 
         <div class="chat-input-area">
             <input type="text" id="chat-user-input" placeholder="Bir soru sorun..." onkeypress="handleChatKeyPress(event)">
@@ -177,16 +209,174 @@
 
     <div id="loginModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
-            <h2>Login</h2>
-            <p>Firebase bağlantısı henüz yapılmadı.</p>
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2 style="text-align:center; margin-bottom:20px; color:#333;">Giriş Yap</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required placeholder="ornek@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Şifre</label>
+                    <input type="password" id="loginPassword" required placeholder="******">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Giriş Yap</button>
+            </form>
+            <div class="auth-switch">
+                Hesabın yok mu? <a onclick="switchModal('loginModal', 'registerModal')">Kayıt Ol</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2 style="text-align:center; margin-bottom:20px; color:#333;">Kayıt Ol</h2>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Ad Soyad</label>
+                    <input type="text" id="regName" required placeholder="Adınız">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" required placeholder="ornek@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Şifre</label>
+                    <input type="password" id="regPassword" required placeholder="******">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Kayıt Ol</button>
+            </form>
+            <div class="auth-switch">
+                Zaten üye misin? <a onclick="switchModal('registerModal', 'loginModal')">Giriş Yap</a>
+            </div>
         </div>
     </div>
 
     <script>
+        // ============================================================
+        // 1. FIREBASE KONFİGÜRASYONU (API KEY BURAYA GELECEK)
+        // ============================================================
+        // NOT: Kendi Firebase Konsolundan aldığın bilgileri buraya yapıştır.
+       const firebaseConfig = {
+  apiKey: "AIzaSyAJ6mOt-sTQmCdr0NatQ7Sy_L9RcE2jmuY",
+  authDomain: "nanosynapsetech-site.firebaseapp.com",
+  projectId: "nanosynapsetech-site",
+  storageBucket: "nanosynapsetech-site.firebasestorage.app",
+  messagingSenderId: "623623682756",
+  appId: "1:623623682756:web:d1a575d6a656dc33596791",
+  measurementId: "G-6ZTKDHX7TZ"
+};
+
+
+        // Firebase'i Güvenli Başlatma
+        let auth; // Auth servisini global yap
+        try {
+            if (firebaseConfig.apiKey !== "BURAYA_FIREBASE_API_KEY_GELECEK") {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                
+                // Kullanıcı durumunu dinle (Giriş yaptı mı?)
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        document.getElementById('auth-buttons').style.display = 'none';
+                        document.getElementById('user-profile').style.display = 'flex';
+                        document.getElementById('nav-username').innerText = user.email.split('@')[0]; // İsim yerine email başı
+                        closeModal('loginModal');
+                        closeModal('registerModal');
+                    } else {
+                        document.getElementById('auth-buttons').style.display = 'block';
+                        document.getElementById('user-profile').style.display = 'none';
+                    }
+                });
+            } else {
+                console.warn("Firebase API Key eksik! Üyelik sistemi Demo modunda.");
+            }
+        } catch (e) {
+            console.error("Firebase Hatası:", e);
+        }
+
+        // ============================================================
+        // 2. UI FONKSİYONLARI (MODAL & GÖRÜNÜM)
+        // ============================================================
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function switchModal(closeId, openId) {
+            closeModal(closeId);
+            openModal(openId);
+        }
         
-        // --- CHATBOT JS KODLARI ---
+        // Modal dışına tıklayınca kapatma
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+
+        // ============================================================
+        // 3. AUTH İŞLEMLERİ (GİRİŞ / KAYIT)
+        // ============================================================
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+
+            if (!auth) { alert("API Key eksik olduğu için giriş yapılamıyor."); return; }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                alert("Giriş Başarılı!");
+            } catch (error) {
+                alert("Hata: " + error.message);
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPassword').value;
+
+            if (!auth) { alert("API Key eksik."); return; }
+
+            try {
+                await auth.createUserWithEmailAndPassword(email, pass);
+                alert("Hesap oluşturuldu! Otomatik giriş yapılıyor.");
+            } catch (error) {
+                alert("Kayıt Hatası: " + error.message);
+            }
+        }
+
+        function logout() {
+            if(auth) auth.signOut();
+            alert("Çıkış yapıldı.");
+        }
+
+        // ============================================================
+        // 4. GELİŞMİŞ CHATBOT (HİBRİT ZEKA)
+        // ============================================================
+        
+        // YEREL ZEKA VERİTABANI (Sunucu kapalıysa bunlar çalışır)
+        const localKnowledge = {
+            "merhaba": "Merhaba! Size bilimsel araştırmalarımız hakkında nasıl yardımcı olabilirim?",
+            "selam": "Selamlar! NanoSynapseTech'e hoş geldiniz.",
+            "nasılsın": "Ben bir yapay zekayım, her zaman çalışmaya hazırım! Sen nasılsın?",
+            "kimsin": "Ben NanoSynapseTech platformunun asistanıyım.",
+            
+            "nano": "Nanopartikül araştırmalarımızda, ilaçları doğrudan hastalıklı hücreye taşıyan mikroskobik taşıyıcılar geliştiriyoruz. Bu sayede yan etkiler azalıyor.",
+            "partikül": "Nanopartikül araştırmalarımızda, ilaçları doğrudan hastalıklı hücreye taşıyan mikroskobik taşıyıcılar geliştiriyoruz.",
+            
+            "kanser": "Kanser araştırmalarımızda, kemoterapinin etkisini artırıp sağlıklı hücreleri koruyan 'Akıllı İlaç' sistemleri üzerine çalışıyoruz.",
+            "onkoloji": "Onkoloji bölümümüz özellikle pankreas ve akciğer kanseri üzerine yoğunlaşmıştır.",
+            
+            "biyo": "Biyoinformatik laboratuvarımızda, büyük DNA verilerini analiz ederek genetik hastalık risklerini hesaplıyoruz.",
+            "genom": "Genom dizileme teknolojilerimiz en son teknoloji Illumina cihazlarıyla yapılmaktadır.",
+            
+            "bitki": "Bitki patolojisi bölümümüz, tarım ürünlerini tehdit eden virüslere karşı RNA tabanlı aşılar geliştiriyor.",
+            
+            "kayıt": "Sağ üstteki 'Login' butonuna basıp 'Kayıt Ol' seçeneği ile aramıza katılabilirsin.",
+            "giriş": "Giriş yapmak için sağ üstteki butonu kullanabilirsin."
+        };
+
         function toggleChat() {
             const chatContainer = document.getElementById('chat-container');
             chatContainer.classList.toggle('active');
@@ -203,49 +393,63 @@
             const input = document.getElementById('chat-user-input');
             const chatBox = document.getElementById('chat-box');
             const typingIndicator = document.getElementById('typing-indicator');
-            const message = input.value.trim();
+            const rawMessage = input.value.trim();
 
-            if (!message) return;
+            if (!rawMessage) return;
 
-            // 1. Kullanıcı Mesajını Ekle
-            addChatMessage(message, 'user-message');
+            // 1. Mesajı Ekrana Bas
+            addChatMessage(rawMessage, 'user-message');
             input.value = '';
-
-            // 2. "Yazıyor..." göster
             typingIndicator.style.display = 'block';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            try {
-                // 3. Backend'e (Python'a) Gönder
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ kullanici_mesaji: message }) // Python bu ismi bekliyor
-                });
+            // 2. Hibrit Cevaplama Mantığı
+            let botReply = null;
+            const messageLower = rawMessage.toLowerCase();
 
-                const data = await response.json();
-                
-                // 4. Cevabı Al ve Ekrana Yaz
-                typingIndicator.style.display = 'none';
-                
-                if(data.cevap) {
-                    addChatMessage(data.cevap, 'bot-message');
-                } else {
-                    addChatMessage("Anlaşılamadı.", 'bot-message');
+            // Önce Yerel Zekaya Bak (Hız için)
+            for (const [key, value] of Object.entries(localKnowledge)) {
+                if (messageLower.includes(key)) {
+                    botReply = value;
+                    break;
                 }
-
-            } catch (error) {
-                typingIndicator.style.display = 'none';
-                addChatMessage("Bağlantı Hatası: Python sunucusu kapalı olabilir.", 'bot-message');
-                console.error('Hata:', error);
             }
+
+            // Eğer Yerel Zekada cevap bulamazsak veya sunucuyu denemek istersek:
+            if (!botReply) {
+                try {
+                    // Render Sunucusuna İstek At (Python Beyni)
+                    // NOT: Buraya kendi Render linkini yapıştır:
+                    const backendURL = 'https://nanosynaptec-api.onrender.com/chat'; 
+                    
+                    const response = await fetch(backendURL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ kullanici_mesaji: rawMessage })
+                    });
+
+                    const data = await response.json();
+                    botReply = data.cevap || data.reply;
+
+                } catch (error) {
+                    console.log("Sunucuya ulaşılamadı, varsayılan cevap veriliyor.");
+                    botReply = "Şu an sunucuyla iletişim kuramıyorum ama araştırmalarımız hakkında genel bilgi için 'Kanser' veya 'Nano' yazabilirsin.";
+                }
+            }
+
+            // 3. Cevabı Ekrana Bas
+            // Biraz gerçekçilik için 600ms gecikme ekleyelim
+            setTimeout(() => {
+                typingIndicator.style.display = 'none';
+                addChatMessage(botReply || "Bunu tam anlayamadım. 'Nano', 'Kanser' veya 'Biyo' yazmayı dener misin?", 'bot-message');
+            }, 600);
         }
 
         function addChatMessage(text, className) {
             const chatBox = document.getElementById('chat-box');
             const div = document.createElement('div');
             div.className = `message ${className}`;
-            div.textContent = text;
+            div.innerHTML = text; // HTML etiketlerini desteklemesi için innerHTML
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
