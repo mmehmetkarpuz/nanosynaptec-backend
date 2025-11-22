@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NanoSynapseTech - AI Powered Platform</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <style>
+        /* === TEMEL STİLLER === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* HEADER */
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+        }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; }
+        .logo {
+            font-size: 1.8rem; font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .nav-links { display: flex; list-style: none; gap: 2rem; }
+        .nav-links a { color: white; text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        .nav-links a:hover { color: #4ecdc4; }
+        .right-section { display: flex; align-items: center; gap: 1rem; }
+        
+        /* BUTTONS */
+        .btn { padding: 0.7rem 1.5rem; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; }
+        .btn-secondary { background: transparent; color: white; border: 2px solid white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        /* MAIN CONTENT */
+        main { margin-top: 80px; padding: 2rem 0; flex-grow: 1; }
+        .hero { text-align: center; padding: 4rem 0; color: white; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.95); margin: 2rem 0; padding: 3rem 2rem;
+            border-radius: 20px; backdrop-filter: blur(10px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 { text-align: center; color: #667eea; margin-bottom: 2rem; }
+        
+        .research-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .research-card {
+            background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+            padding: 2rem; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s;
+        }
+        .research-card:hover { transform: translateY(-10px); }
+        
+        /* === CHATBOT STİLLERİ === */
+        .chat-toggle-btn {
+            position: fixed; bottom: 20px; right: 20px; width: 65px; height: 65px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border-radius: 50%; color: white; border: none; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+            display: flex; align-items: center; justify-content: center; font-size: 30px;
+            transition: transform 0.3s ease; z-index: 3000;
+        }
+        .chat-toggle-btn:hover { transform: scale(1.1); }
+
+        .chat-container {
+            position: fixed; bottom: 100px; right: 20px; width: 360px; height: 500px;
+            background: white; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; overflow: hidden; z-index: 2999;
+            opacity: 0; pointer-events: none; transform: translateY(20px);
+            transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.1);
+        }
+        .chat-container.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+        .chat-header {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .chat-close-btn { background: none; border: none; color: white; cursor: pointer; font-size: 18px; }
+
+        #chat-box {
+            flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .message { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .bot-message { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user-message { background: #0072ff; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        
+        .chat-input-area { padding: 15px; border-top: 1px solid #eee; display: flex; background: white; }
+        #chat-user-input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        #chat-send-btn {
+            background: #0072ff; color: white; border: none; width: 40px; height: 40px;
+            border-radius: 50%; margin-left: 10px; cursor: pointer;
+        }
+
+        .typing-indicator { display: none; padding: 10px; font-size: 12px; color: #888; font-style: italic; margin-left: 10px; }
+
+        /* MODALS */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 10% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 20px; position: relative; }
+        .close { float: right; font-size: 28px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">NanoSynapseTech</div>
+            <div class="right-section">
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#research">Research</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+                <button class="btn btn-secondary" onclick="openModal('loginModal')">Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero" id="home">
+            <h1>NanoSynapseTech</h1>
+            <p>Advancing Science Through Nanotechnology & AI</p>
+            <button class="btn btn-primary" onclick="document.getElementById('research').scrollIntoView()">Explore Research</button>
+        </section>
+
+        <section id="research" class="section">
+            <h2>Research Areas</h2>
+            <div class="research-grid">
+                <div class="research-card"><h3>🔬 Nanoparticles</h3><p>Targeted drug delivery systems</p></div>
+                <div class="research-card"><h3>🧬 Bioinformatics</h3><p>Genomic data analysis</p></div>
+                <div class="research-card"><h3>🌱 Plant Pathology</h3><p>Disease resistance study</p></div>
+                <div class="research-card"><h3>🎗️ Cancer Research</h3><p>Micro-robotics in oncology</p></div>
+            </div>
+        </section>
+    </main>
+
+    <button class="chat-toggle-btn" onclick="toggleChat()">
+        <i class="fas fa-robot"></i>
+    </button>
+
+    <div class="chat-container" id="chat-container">
+        <div class="chat-header">
+            <div>
+                <h3 style="margin:0; font-size:16px;">NanoSynapse Asistan</h3>
+                <p style="margin:0; font-size:11px; opacity:0.9;">🟢 AI Online</p>
+            </div>
+            <button class="chat-close-btn" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div id="chat-box">
+            <div class="message bot-message">
+                Merhaba! 👋 Ben NanoSynapseTech asistanıyım. Araştırmalarımız (Nano, Kanser, Biyo) hakkında ne öğrenmek istersin?
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typing-indicator">Asistan yazıyor...</div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chat-user-input" placeholder="Bir soru sorun..." onkeypress="handleChatKeyPress(event)">
+            <button id="chat-send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
+            <h2>Login</h2>
+            <p>Firebase bağlantısı henüz yapılmadı.</p>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        
+        // --- CHATBOT JS KODLARI ---
+        function toggleChat() {
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.classList.toggle('active');
+            if (chatContainer.classList.contains('active')) {
+                document.getElementById('chat-user-input').focus();
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-user-input');
+            const chatBox = document.getElementById('chat-box');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // 1. Kullanıcı Mesajını Ekle
+            addChatMessage(message, 'user-message');
+            input.value = '';
+
+            // 2. "Yazıyor..." göster
+            typingIndicator.style.display = 'block';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                // 3. Backend'e (Python'a) Gönder
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kullanici_mesaji: message }) // Python bu ismi bekliyor
+                });
+
+                const data = await response.json();
+                
+                // 4. Cevabı Al ve Ekrana Yaz
+                typingIndicator.style.display = 'none';
+                
+                if(data.cevap) {
+                    addChatMessage(data.cevap, 'bot-message');
+                } else {
+                    addChatMessage("Anlaşılamadı.", 'bot-message');
+                }
+
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                addChatMessage("Bağlantı Hatası: Python sunucusu kapalı olabilir.", 'bot-message');
+                console.error('Hata:', error);
+            }
+        }
+
+        function addChatMessage(text, className) {
+            const chatBox = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.className = `message ${className}`;
+            div.textContent = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
