@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NanoSynapseTech - AI Powered Platform</title>
     
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -12,7 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* === TEMEL STİLLER (MEVCUT TASARIM KORUNDU) === */
+        /* === TEMEL STİLLER === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -67,7 +69,7 @@
         }
         .research-card:hover { transform: translateY(-10px); }
         
-        /* === CHATBOT STİLLERİ (GELİŞTİRİLMİŞ) === */
+        /* === CHATBOT STİLLERİ === */
         .chat-toggle-btn {
             position: fixed; bottom: 20px; right: 20px; width: 65px; height: 65px;
             background: linear-gradient(135deg, #00c6ff, #0072ff);
@@ -257,29 +259,28 @@
         // ============================================================
         // 1. FIREBASE KONFİGÜRASYONU (API KEY BURAYA GELECEK)
         // ============================================================
-        // NOT: Kendi Firebase Konsolundan aldığın bilgileri buraya yapıştır.
+        // Lütfen kendi proje ayarlarınızdan aldığınız config'i buraya yapıştırın
         const firebaseConfig = {
-            apiKey: "BURAYA_FIREBASE_API_KEY_GELECEK",
-            authDomain: "nanosynapsetech-site.firebaseapp.com",
-            projectId: "nanosynapsetech-site",
-            storageBucket: "nanosynapsetech-site.appspot.com",
-            messagingSenderId: "SENDER_ID",
-            appId: "APP_ID"
+            // apiKey: "...",
+            // authDomain: "...",
+            // projectId: "...",
+            // ...
         };
 
         // Firebase'i Güvenli Başlatma
         let auth; // Auth servisini global yap
         try {
-            if (firebaseConfig.apiKey !== "BURAYA_FIREBASE_API_KEY_GELECEK") {
+            // Eğer config boş değilse başlat
+            if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.apiKey) {
                 firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 
-                // Kullanıcı durumunu dinle (Giriş yaptı mı?)
+                // Kullanıcı durumunu dinle
                 auth.onAuthStateChanged(user => {
                     if (user) {
                         document.getElementById('auth-buttons').style.display = 'none';
                         document.getElementById('user-profile').style.display = 'flex';
-                        document.getElementById('nav-username').innerText = user.email.split('@')[0]; // İsim yerine email başı
+                        document.getElementById('nav-username').innerText = user.email.split('@')[0];
                         closeModal('loginModal');
                         closeModal('registerModal');
                     } else {
@@ -347,13 +348,14 @@
         function logout() {
             if(auth) auth.signOut();
             alert("Çıkış yapıldı.");
+            location.reload();
         }
 
         // ============================================================
         // 4. GELİŞMİŞ CHATBOT (HİBRİT ZEKA)
         // ============================================================
         
-        // YEREL ZEKA VERİTABANI (Sunucu kapalıysa bunlar çalışır)
+        // YEREL ZEKA VERİTABANI
         const localKnowledge = {
             "merhaba": "Merhaba! Size bilimsel araştırmalarımız hakkında nasıl yardımcı olabilirim?",
             "selam": "Selamlar! NanoSynapseTech'e hoş geldiniz.",
@@ -405,7 +407,7 @@
             let botReply = null;
             const messageLower = rawMessage.toLowerCase();
 
-            // Önce Yerel Zekaya Bak (Hız için)
+            // Önce Yerel Zekaya Bak
             for (const [key, value] of Object.entries(localKnowledge)) {
                 if (messageLower.includes(key)) {
                     botReply = value;
@@ -413,14 +415,11 @@
                 }
             }
 
-            // Eğer Yerel Zekada cevap bulamazsak veya sunucuyu denemek istersek:
+            // Eğer Yerel Zekada cevap bulamazsak:
             if (!botReply) {
                 try {
-                    // Render Sunucusuna İstek At (Python Beyni)
-                    // NOT: Buraya kendi Render linkini yapıştır:
-                    const backendURL = '// Render Sunucusuna İstek At (Python Beyni)
-// NOT: Buraya kendi Render linkini yapıştır:
-const backendURL = 'https://nanosynapsetec.onrender.com/chat';'; 
+                    // DÜZELTME: Hata buradaydı. Linki temizledik.
+                    const backendURL = 'https://nanosynapsetec.onrender.com/chat';
                     
                     const response = await fetch(backendURL, {
                         method: 'POST',
@@ -438,7 +437,6 @@ const backendURL = 'https://nanosynapsetec.onrender.com/chat';';
             }
 
             // 3. Cevabı Ekrana Bas
-            // Biraz gerçekçilik için 600ms gecikme ekleyelim
             setTimeout(() => {
                 typingIndicator.style.display = 'none';
                 addChatMessage(botReply || "Bunu tam anlayamadım. 'Nano', 'Kanser' veya 'Biyo' yazmayı dener misin?", 'bot-message');
@@ -449,7 +447,7 @@ const backendURL = 'https://nanosynapsetec.onrender.com/chat';';
             const chatBox = document.getElementById('chat-box');
             const div = document.createElement('div');
             div.className = `message ${className}`;
-            div.innerHTML = text; // HTML etiketlerini desteklemesi için innerHTML
+            div.innerHTML = text;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
