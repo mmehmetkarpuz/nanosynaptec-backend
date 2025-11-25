@@ -6,15 +6,12 @@
     <title>NanoSynapseTech - AI Powered Platform</title>
     
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* === TEMEL STİLLER === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,7 +19,8 @@
             color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex; flex-direction: column;
+            display: flex; 
+            flex-direction: column;
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         
@@ -31,22 +29,40 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            position: fixed; width: 100%; top: 0; z-index: 1000;
+            position: fixed; 
+            width: 100%; 
+            top: 0; 
+            z-index: 1000;
         }
         nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; }
         .logo {
-            font-size: 1.8rem; font-weight: bold;
+            font-size: 1.8rem; 
+            font-weight: bold;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text;
             cursor: pointer;
         }
         .nav-links { display: flex; list-style: none; gap: 2rem; }
-        .nav-links a { color: white; text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        .nav-links a { 
+            color: white; 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: all 0.3s ease; 
+        }
         .nav-links a:hover { color: #4ecdc4; }
         .right-section { display: flex; align-items: center; gap: 1rem; }
         
         /* BUTTONS */
-        .btn { padding: 0.7rem 1.5rem; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+        .btn { 
+            padding: 0.7rem 1.5rem; 
+            border: none; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+        }
         .btn-primary { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; }
         .btn-secondary { background: transparent; color: white; border: 2px solid white; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
@@ -54,83 +70,455 @@
         /* MAIN CONTENT */
         main { margin-top: 80px; padding: 2rem 0; flex-grow: 1; }
         .hero { text-align: center; padding: 4rem 0; color: white; }
-        .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; animation: fadeInDown 1s ease; }
+        .hero p { font-size: 1.3rem; margin-bottom: 2rem; animation: fadeInUp 1s ease 0.2s both; }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
         .section {
-            background: rgba(255, 255, 255, 0.95); margin: 2rem 0; padding: 3rem 2rem;
-            border-radius: 20px; backdrop-filter: blur(10px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.95); 
+            margin: 2rem 0; 
+            padding: 3rem 2rem;
+            border-radius: 20px; 
+            backdrop-filter: blur(10px); 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
         }
-        .section h2 { text-align: center; color: #667eea; margin-bottom: 2rem; }
+        .section h2 { 
+            text-align: center; 
+            color: #667eea; 
+            margin-bottom: 2rem; 
+            font-size: 2.5rem;
+        }
         
-        .research-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .research-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 2rem; 
+        }
         .research-card {
-            background: linear-gradient(135deg, #667eea, #764ba2); color: white;
-            padding: 2rem; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s;
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white;
+            padding: 2rem; 
+            border-radius: 15px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-        .research-card:hover { transform: translateY(-10px); }
-        
-        /* === CHATBOT STİLLERİ === */
+        .research-card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .research-card i { font-size: 3rem; margin-bottom: 1rem; }
+        .research-card h3 { margin-bottom: 0.5rem; }
+
+        /* TRAINING SESSIONS */
+        .training-sessions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .training-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .training-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .training-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+        .training-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .training-badge.live {
+            background: #4ecdc4;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .training-body {
+            padding: 1.5rem;
+        }
+        .training-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .training-info i {
+            margin-right: 0.5rem;
+            color: #667eea;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #4ecdc4);
+            transition: width 0.3s ease;
+        }
+        .enroll-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .enroll-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .enroll-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* ADVANCED CHATBOT */
         .chat-toggle-btn {
-            position: fixed; bottom: 20px; right: 20px; width: 65px; height: 65px;
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            border-radius: 50%; color: white; border: none; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
-            display: flex; align-items: center; justify-content: center; font-size: 30px;
-            transition: transform 0.3s ease; z-index: 3000;
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            width: 70px; 
+            height: 70px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%; 
+            color: white; 
+            border: none; 
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 32px;
+            transition: all 0.3s ease; 
+            z-index: 3000;
         }
-        .chat-toggle-btn:hover { transform: scale(1.1); }
+        .chat-toggle-btn:hover { 
+            transform: scale(1.15) rotate(10deg); 
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
 
         .chat-container {
-            position: fixed; bottom: 100px; right: 20px; width: 360px; height: 500px;
-            background: white; border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column; overflow: hidden; z-index: 2999;
-            opacity: 0; pointer-events: none; transform: translateY(20px);
-            transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.1);
+            position: fixed; 
+            bottom: 110px; 
+            right: 20px; 
+            width: 400px; 
+            height: 600px;
+            background: white; 
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            z-index: 2999;
+            opacity: 0; 
+            pointer-events: none; 
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        .chat-container.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+        .chat-container.active { 
+            opacity: 1; 
+            pointer-events: all; 
+            transform: translateY(0) scale(1); 
+        }
 
         .chat-header {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
         }
-        .chat-close-btn { background: none; border: none; color: white; cursor: pointer; font-size: 18px; }
+        .chat-header-info h3 {
+            margin: 0; 
+            font-size: 18px;
+        }
+        .chat-header-info p {
+            margin: 5px 0 0 0; 
+            font-size: 12px; 
+            opacity: 0.9;
+        }
+        .chat-close-btn { 
+            background: rgba(255,255,255,0.2); 
+            border: none; 
+            color: white; 
+            cursor: pointer; 
+            font-size: 20px; 
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .chat-close-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
 
         #chat-box {
-            flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9;
-            display: flex; flex-direction: column; gap: 10px;
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px;
         }
-        .message { max-width: 85%; padding: 10px 15px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-        .bot-message { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #ddd; }
-        .user-message { background: #0072ff; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        #chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chat-box::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+        .message { 
+            max-width: 80%; 
+            padding: 12px 18px; 
+            border-radius: 18px; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            word-wrap: break-word;
+            animation: messageSlide 0.3s ease;
+        }
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .bot-message { 
+            background: linear-gradient(135deg, #e9ecef, #dee2e6); 
+            color: #333; 
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .user-message { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
+        }
         
-        .chat-input-area { padding: 15px; border-top: 1px solid #eee; display: flex; background: white; }
-        #chat-user-input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
-        #chat-send-btn {
-            background: #0072ff; color: white; border: none; width: 40px; height: 40px;
-            border-radius: 50%; margin-left: 10px; cursor: pointer; transition: background 0.3s;
+        .typing-indicator { 
+            display: none; 
+            padding: 10px 20px; 
+            font-size: 13px; 
+            color: #888; 
+            font-style: italic;
+            align-self: flex-start;
         }
-        #chat-send-btn:hover { background: #0056b3; }
+        .typing-dots {
+            display: inline-block;
+        }
+        .typing-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typingDots 1.4s infinite;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingDots {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
 
-        .typing-indicator { display: none; padding: 5px 15px; font-size: 12px; color: #888; font-style: italic; }
+        .chat-input-area { 
+            padding: 20px; 
+            border-top: 1px solid #eee; 
+            display: flex; 
+            gap: 10px;
+            background: white; 
+        }
+        #chat-user-input { 
+            flex: 1; 
+            padding: 12px 18px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 25px; 
+            outline: none;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        #chat-user-input:focus {
+            border-color: #667eea;
+        }
+        #chat-send-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+            border: none; 
+            width: 45px; 
+            height: 45px;
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #chat-send-btn:hover { 
+            transform: scale(1.1); 
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
 
-        /* MODALS & FORMS */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 10px 20px 0;
+        }
+        .quick-action-btn {
+            padding: 6px 14px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .quick-action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* MODALS */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(5px); 
+        }
         .modal-content { 
-            background: white; margin: 10% auto; padding: 2.5rem; width: 90%; max-width: 450px; 
-            border-radius: 20px; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background: white; 
+            margin: 8% auto; 
+            padding: 2.5rem; 
+            width: 90%; 
+            max-width: 450px; 
+            border-radius: 20px; 
+            position: relative; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             animation: slideDown 0.3s ease-out;
         }
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideDown { 
+            from { transform: translateY(-50px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
         
-        .close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: #aaa; }
+        .close { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            font-size: 24px; 
+            cursor: pointer; 
+            color: #aaa;
+            transition: color 0.3s;
+        }
         .close:hover { color: #333; }
         
         .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        .auth-switch { text-align: center; margin-top: 15px; font-size: 0.9rem; }
-        .auth-switch a { color: #667eea; cursor: pointer; text-decoration: underline; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            font-weight: 600; 
+            color: #555; 
+        }
+        .form-group input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .auth-switch { 
+            text-align: center; 
+            margin-top: 15px; 
+            font-size: 0.9rem; 
+        }
+        .auth-switch a { 
+            color: #667eea; 
+            cursor: pointer; 
+            text-decoration: underline; 
+        }
+
+        /* FOOTER */
+        footer {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+        footer h3 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        footer p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .chat-container { width: 90%; right: 5%; }
+            .nav-links { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -141,6 +529,7 @@
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#research">Research</a></li>
+                    <li><a href="#training">Training</a></li>
                     <li><a href="#about">About</a></li>
                 </ul>
                 <div id="auth-buttons">
@@ -148,7 +537,7 @@
                 </div>
                 <div id="user-profile" style="display:none; align-items:center; gap:10px;">
                     <span style="color:white; font-weight:bold;" id="nav-username">User</span>
-                    <button class="btn btn-secondary" style="padding: 0.4rem 1rem; font-size:0.8rem;" onclick="logout()">Çıkış</button>
+                    <button class="btn btn-secondary" style="padding: 0.4rem 1rem; font-size:0.8rem;" onclick="logout()">Logout</button>
                 </div>
             </div>
         </nav>
@@ -158,27 +547,137 @@
         <section class="hero" id="home">
             <h1>NanoSynapseTech</h1>
             <p>Advancing Science Through Nanotechnology & AI</p>
-            <button class="btn btn-primary" onclick="document.getElementById('research').scrollIntoView()">Explore Research</button>
+            <button class="btn btn-primary" onclick="document.getElementById('research').scrollIntoView({behavior: 'smooth'})">Explore Research</button>
         </section>
 
         <section id="research" class="section">
             <h2>Research Areas</h2>
             <div class="research-grid">
-                <div class="research-card" onclick="alert('Nanopartikül detayları yakında...')">
-                    <h3>🔬 Nanoparticles</h3><p>Targeted drug delivery systems</p>
+                <div class="research-card" onclick="showResearchDetails('nanoparticles')">
+                    <i class="fas fa-atom"></i>
+                    <h3>Nanoparticles</h3>
+                    <p>Targeted drug delivery systems</p>
                 </div>
-                <div class="research-card">
-                    <h3>🧬 Bioinformatics</h3><p>Genomic data analysis</p>
+                <div class="research-card" onclick="showResearchDetails('bioinformatics')">
+                    <i class="fas fa-dna"></i>
+                    <h3>Bioinformatics</h3>
+                    <p>Genomic data analysis</p>
                 </div>
-                <div class="research-card">
-                    <h3>🌱 Plant Pathology</h3><p>Disease resistance study</p>
+                <div class="research-card" onclick="showResearchDetails('plant')">
+                    <i class="fas fa-seedling"></i>
+                    <h3>Plant Pathology</h3>
+                    <p>Disease resistance study</p>
                 </div>
-                <div class="research-card">
-                    <h3>🎗️ Cancer Research</h3><p>Micro-robotics in oncology</p>
+                <div class="research-card" onclick="showResearchDetails('cancer')">
+                    <i class="fas fa-microscope"></i>
+                    <h3>Cancer Research</h3>
+                    <p>Micro-robotics in oncology</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="training" class="section">
+            <h2>Active Training Sessions</h2>
+            <div class="training-sessions">
+                <div class="training-card">
+                    <div class="training-header">
+                        <span class="training-badge live"><i class="fas fa-circle"></i> LIVE</span>
+                        <h3>Advanced Nanotechnology</h3>
+                        <p>Introduction to Nanoparticle Design</p>
+                    </div>
+                    <div class="training-body">
+                        <p>Learn the fundamentals of nanoparticle synthesis and characterization techniques.</p>
+                        <div class="training-info">
+                            <span><i class="fas fa-calendar"></i>Dec 15, 2025</span>
+                            <span><i class="fas fa-clock"></i>6 weeks</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 35%"></div>
+                        </div>
+                        <div class="training-info">
+                            <span><i class="fas fa-users"></i>245 enrolled</span>
+                            <span><i class="fas fa-signal"></i>Intermediate</span>
+                        </div>
+                        <button class="enroll-btn" onclick="enrollTraining('nano')">Join Live Session</button>
+                    </div>
+                </div>
+
+                <div class="training-card">
+                    <div class="training-header">
+                        <span class="training-badge">UPCOMING</span>
+                        <h3>Cancer Biology & Treatment</h3>
+                        <p>Modern Oncology Approaches</p>
+                    </div>
+                    <div class="training-body">
+                        <p>Explore cutting-edge cancer research and innovative treatment methodologies.</p>
+                        <div class="training-info">
+                            <span><i class="fas fa-calendar"></i>Jan 10, 2026</span>
+                            <span><i class="fas fa-clock"></i>8 weeks</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="training-info">
+                            <span><i class="fas fa-users"></i>189 enrolled</span>
+                            <span><i class="fas fa-signal"></i>Advanced</span>
+                        </div>
+                        <button class="enroll-btn" onclick="enrollTraining('cancer')">Enroll Now</button>
+                    </div>
+                </div>
+
+                <div class="training-card">
+                    <div class="training-header">
+                        <span class="training-badge live"><i class="fas fa-circle"></i> LIVE</span>
+                        <h3>Genomic Data Analysis</h3>
+                        <p>Bioinformatics Essentials</p>
+                    </div>
+                    <div class="training-body">
+                        <p>Master computational tools for analyzing large-scale genomic datasets.</p>
+                        <div class="training-info">
+                            <span><i class="fas fa-calendar"></i>Dec 1, 2025</span>
+                            <span><i class="fas fa-clock"></i>10 weeks</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                        <div class="training-info">
+                            <span><i class="fas fa-users"></i>312 enrolled</span>
+                            <span><i class="fas fa-signal"></i>Intermediate</span>
+                        </div>
+                        <button class="enroll-btn" onclick="enrollTraining('genomics')">Join Live Session</button>
+                    </div>
+                </div>
+
+                <div class="training-card">
+                    <div class="training-header">
+                        <span class="training-badge">UPCOMING</span>
+                        <h3>Plant Disease Management</h3>
+                        <p>Agricultural Biotechnology</p>
+                    </div>
+                    <div class="training-body">
+                        <p>Study plant-pathogen interactions and develop disease-resistant crops.</p>
+                        <div class="training-info">
+                            <span><i class="fas fa-calendar"></i>Feb 5, 2026</span>
+                            <span><i class="fas fa-clock"></i>7 weeks</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="training-info">
+                            <span><i class="fas fa-users"></i>156 enrolled</span>
+                            <span><i class="fas fa-signal"></i>Beginner</span>
+                        </div>
+                        <button class="enroll-btn" onclick="enrollTraining('plant')">Enroll Now</button>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
+
+    <footer>
+        <h3>NanoSynapseTech</h3>
+        <p>&copy; 2025 All Rights Reserved</p>
+    </footer>
 
     <button class="chat-toggle-btn" onclick="toggleChat()">
         <i class="fas fa-robot"></i>
@@ -186,271 +685,50 @@
 
     <div class="chat-container" id="chat-container">
         <div class="chat-header">
-            <div>
-                <h3 style="margin:0; font-size:16px;">NanoSynapse Asistan</h3>
-                <p style="margin:0; font-size:11px; opacity:0.9;">🟢 AI Online | Hybrid Mode</p>
+            <div class="chat-header-info">
+                <h3><i class="fas fa-brain"></i> NanoSynapse AI Assistant</h3>
+                <p><i class="fas fa-circle" style="color: #4ecdc4; font-size: 8px;"></i> Advanced Neural Network Active</p>
             </div>
-            <button class="chat-close-btn" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+            <button class="chat-close-btn" onclick="toggleChat()">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         
         <div id="chat-box">
             <div class="message bot-message">
-                Merhaba! 👋 Ben NanoSynapseTech asistanıyım. 
+                👋 Welcome! I'm your advanced AI research assistant powered by neural networks.
                 <br><br>
-                Size <b>Nanopartiküller</b>, <b>Kanser Araştırmaları</b> veya <b>Üyelik işlemleri</b> hakkında bilgi verebilirim. Ne sormak istersiniz?
+                I can help you with:
+                <br>• <b>Research Areas</b> - Nanoparticles, Cancer, Genomics
+                <br>• <b>Training Programs</b> - Enrollment & schedules
+                <br>• <b>Technical Questions</b> - Scientific methodologies
+                <br><br>
+                How can I assist you today?
             </div>
         </div>
         
-        <div class="typing-indicator" id="typing-indicator">Asistan düşünüyor...</div>
+        <div class="quick-actions">
+            <button class="quick-action-btn" onclick="quickQuestion('nano')">Nanoparticles</button>
+            <button class="quick-action-btn" onclick="quickQuestion('cancer')">Cancer Research</button>
+            <button class="quick-action-btn" onclick="quickQuestion('training')">Training Info</button>
+        </div>
+
+        <div class="typing-indicator" id="typing-indicator">
+            <div class="typing-dots">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
 
         <div class="chat-input-area">
-            <input type="text" id="chat-user-input" placeholder="Bir soru sorun..." onkeypress="handleChatKeyPress(event)">
-            <button id="chat-send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+            <input type="text" id="chat-user-input" placeholder="Ask me anything..." onkeypress="handleChatKeyPress(event)">
+            <button id="chat-send-btn" onclick="sendChatMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
     </div>
 
+    <!-- LOGIN MODAL -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('loginModal')">&times;</span>
-            <h2 style="text-align:center; margin-bottom:20px; color:#333;">Giriş Yap</h2>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" required placeholder="ornek@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Şifre</label>
-                    <input type="password" id="loginPassword" required placeholder="******">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;">Giriş Yap</button>
-            </form>
-            <div class="auth-switch">
-                Hesabın yok mu? <a onclick="switchModal('loginModal', 'registerModal')">Kayıt Ol</a>
-            </div>
-        </div>
-    </div>
-
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('registerModal')">&times;</span>
-            <h2 style="text-align:center; margin-bottom:20px; color:#333;">Kayıt Ol</h2>
-            <form onsubmit="handleRegister(event)">
-                <div class="form-group">
-                    <label>Ad Soyad</label>
-                    <input type="text" id="regName" required placeholder="Adınız">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="regEmail" required placeholder="ornek@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Şifre</label>
-                    <input type="password" id="regPassword" required placeholder="******">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;">Kayıt Ol</button>
-            </form>
-            <div class="auth-switch">
-                Zaten üye misin? <a onclick="switchModal('registerModal', 'loginModal')">Giriş Yap</a>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ============================================================
-        // 1. FIREBASE KONFİGÜRASYONU (API KEY BURAYA GELECEK)
-        // ============================================================
-        // Lütfen kendi proje ayarlarınızdan aldığınız config'i buraya yapıştırın
-        const firebaseConfig = {
-            // apiKey: "...",
-            // authDomain: "...",
-            // projectId: "...",
-            // ...
-        };
-
-        // Firebase'i Güvenli Başlatma
-        let auth; // Auth servisini global yap
-        try {
-            // Eğer config boş değilse başlat
-            if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.apiKey) {
-                firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                
-                // Kullanıcı durumunu dinle
-                auth.onAuthStateChanged(user => {
-                    if (user) {
-                        document.getElementById('auth-buttons').style.display = 'none';
-                        document.getElementById('user-profile').style.display = 'flex';
-                        document.getElementById('nav-username').innerText = user.email.split('@')[0];
-                        closeModal('loginModal');
-                        closeModal('registerModal');
-                    } else {
-                        document.getElementById('auth-buttons').style.display = 'block';
-                        document.getElementById('user-profile').style.display = 'none';
-                    }
-                });
-            } else {
-                console.warn("Firebase API Key eksik! Üyelik sistemi Demo modunda.");
-            }
-        } catch (e) {
-            console.error("Firebase Hatası:", e);
-        }
-
-        // ============================================================
-        // 2. UI FONKSİYONLARI (MODAL & GÖRÜNÜM)
-        // ============================================================
-        function openModal(id) { document.getElementById(id).style.display = 'block'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function switchModal(closeId, openId) {
-            closeModal(closeId);
-            openModal(openId);
-        }
-        
-        // Modal dışına tıklayınca kapatma
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = "none";
-            }
-        }
-
-        // ============================================================
-        // 3. AUTH İŞLEMLERİ (GİRİŞ / KAYIT)
-        // ============================================================
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPassword').value;
-
-            if (!auth) { alert("API Key eksik olduğu için giriş yapılamıyor."); return; }
-
-            try {
-                await auth.signInWithEmailAndPassword(email, pass);
-                alert("Giriş Başarılı!");
-            } catch (error) {
-                alert("Hata: " + error.message);
-            }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            const email = document.getElementById('regEmail').value;
-            const pass = document.getElementById('regPassword').value;
-
-            if (!auth) { alert("API Key eksik."); return; }
-
-            try {
-                await auth.createUserWithEmailAndPassword(email, pass);
-                alert("Hesap oluşturuldu! Otomatik giriş yapılıyor.");
-            } catch (error) {
-                alert("Kayıt Hatası: " + error.message);
-            }
-        }
-
-        function logout() {
-            if(auth) auth.signOut();
-            alert("Çıkış yapıldı.");
-            location.reload();
-        }
-
-        // ============================================================
-        // 4. GELİŞMİŞ CHATBOT (HİBRİT ZEKA)
-        // ============================================================
-        
-        // YEREL ZEKA VERİTABANI
-        const localKnowledge = {
-            "merhaba": "Merhaba! Size bilimsel araştırmalarımız hakkında nasıl yardımcı olabilirim?",
-            "selam": "Selamlar! NanoSynapseTech'e hoş geldiniz.",
-            "nasılsın": "Ben bir yapay zekayım, her zaman çalışmaya hazırım! Sen nasılsın?",
-            "kimsin": "Ben NanoSynapseTech platformunun asistanıyım.",
-            
-            "nano": "Nanopartikül araştırmalarımızda, ilaçları doğrudan hastalıklı hücreye taşıyan mikroskobik taşıyıcılar geliştiriyoruz. Bu sayede yan etkiler azalıyor.",
-            "partikül": "Nanopartikül araştırmalarımızda, ilaçları doğrudan hastalıklı hücreye taşıyan mikroskobik taşıyıcılar geliştiriyoruz.",
-            
-            "kanser": "Kanser araştırmalarımızda, kemoterapinin etkisini artırıp sağlıklı hücreleri koruyan 'Akıllı İlaç' sistemleri üzerine çalışıyoruz.",
-            "onkoloji": "Onkoloji bölümümüz özellikle pankreas ve akciğer kanseri üzerine yoğunlaşmıştır.",
-            
-            "biyo": "Biyoinformatik laboratuvarımızda, büyük DNA verilerini analiz ederek genetik hastalık risklerini hesaplıyoruz.",
-            "genom": "Genom dizileme teknolojilerimiz en son teknoloji Illumina cihazlarıyla yapılmaktadır.",
-            
-            "bitki": "Bitki patolojisi bölümümüz, tarım ürünlerini tehdit eden virüslere karşı RNA tabanlı aşılar geliştiriyor.",
-            
-            "kayıt": "Sağ üstteki 'Login' butonuna basıp 'Kayıt Ol' seçeneği ile aramıza katılabilirsin.",
-            "giriş": "Giriş yapmak için sağ üstteki butonu kullanabilirsin."
-        };
-
-        function toggleChat() {
-            const chatContainer = document.getElementById('chat-container');
-            chatContainer.classList.toggle('active');
-            if (chatContainer.classList.contains('active')) {
-                document.getElementById('chat-user-input').focus();
-            }
-        }
-
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') sendChatMessage();
-        }
-
-        async function sendChatMessage() {
-            const input = document.getElementById('chat-user-input');
-            const chatBox = document.getElementById('chat-box');
-            const typingIndicator = document.getElementById('typing-indicator');
-            const rawMessage = input.value.trim();
-
-            if (!rawMessage) return;
-
-            // 1. Mesajı Ekrana Bas
-            addChatMessage(rawMessage, 'user-message');
-            input.value = '';
-            typingIndicator.style.display = 'block';
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // 2. Hibrit Cevaplama Mantığı
-            let botReply = null;
-            const messageLower = rawMessage.toLowerCase();
-
-            // Önce Yerel Zekaya Bak
-            for (const [key, value] of Object.entries(localKnowledge)) {
-                if (messageLower.includes(key)) {
-                    botReply = value;
-                    break;
-                }
-            }
-
-            // Eğer Yerel Zekada cevap bulamazsak:
-            if (!botReply) {
-                try {
-                    // DÜZELTME: Hata buradaydı. Linki temizledik.
-                    const backendURL = 'https://nanosynapsetec.onrender.com/chat';
-                    
-                    const response = await fetch(backendURL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ kullanici_mesaji: rawMessage })
-                    });
-
-                    const data = await response.json();
-                    botReply = data.cevap || data.reply;
-
-                } catch (error) {
-                    console.log("Sunucuya ulaşılamadı, varsayılan cevap veriliyor.");
-                    botReply = "Şu an sunucuyla iletişim kuramıyorum ama araştırmalarımız hakkında genel bilgi için 'Kanser' veya 'Nano' yazabilirsin.";
-                }
-            }
-
-            // 3. Cevabı Ekrana Bas
-            setTimeout(() => {
-                typingIndicator.style.display = 'none';
-                addChatMessage(botReply || "Bunu tam anlayamadım. 'Nano', 'Kanser' veya 'Biyo' yazmayı dener misin?", 'bot-message');
-            }, 600);
-        }
-
-        function addChatMessage(text, className) {
-            const chatBox = document.getElementById('chat-box');
-            const div = document.createElement('div');
-            div.className = `message ${className}`;
-            div.innerHTML = text;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    </script>
-</body>
-</html>
+            <h2 style="text-align:center; margin-bottom:
